@@ -1,4 +1,4 @@
-import '../../init'; // hidden-full-source-line
+import {applyTheme} from '../../init'; // hidden-full-source-line
 
 import { html, LitElement, property, customElement } from 'lit-element';
 import '@vaadin/vaadin-button/vaadin-button';
@@ -8,6 +8,11 @@ import '@vaadin/vaadin-button/vaadin-button';
 export class Example extends LitElement {
   @property() clickedText = '';
 
+  connectedCallback() {
+    super.connectedCallback();
+    applyTheme(this.shadowRoot);
+  }
+  
   render() {
     return html`
       <vaadin-button @click=${this.clickListener}>Button</vaadin-button>

@@ -5,8 +5,38 @@
 const fs = require('fs');
 const merge = require('webpack-merge');
 const flowDefaults = require('./webpack.generated.js');
+const glob = require('glob');
 
-const fileNameOfTheFlowGeneratedMainEntryPoint = require('path').resolve(
+const path = require('path');
+
+// Rewrite theme files with different location for resources
+const staticThemeResourceURL = '/theme';
+
+const themeFolder = path.resolve(__dirname, 'target/flow-frontend/theme');
+if (fs.existsSync(themeFolder)) {
+  const entries = glob.sync('**/*.css', {
+    cwd: themeFolder,
+    nodir: true
+  });
+  entries.forEach(entry => {
+    const file = path.resolve(themeFolder, entry);
+    let contents = fs.readFileSync(file, { encoding: 'UTF-8' });
+
+    // Override where the static resources are loaded from
+    contents = contents.replace(
+      "url('theme/",
+      `url('${staticThemeResourceURL}/`
+    );
+    contents = contents.replace(
+      'url("theme/',
+      `url("${staticThemeResourceURL}/`
+    );
+
+    fs.writeFileSync(file, contents);
+  });
+}
+
+const fileNameOfTheFlowGeneratedMainEntryPoint = path.resolve(
   __dirname,
   'target/frontend/generated-flow-imports.js'
 );
